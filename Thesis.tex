@@ -1,0 +1,326 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage[left=3.5cm,right=2.5cm,top=3cm,bottom=3cm]{geometry}
+\setlength{\parindent}{0pt}
+\usepackage{amsthm,amsmath,amsfonts,amsfonts,amsxtra,amssymb,latexsym, amscd}
+\usepackage{tcolorbox}
+\usepackage{import}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{pgf,tikz}
+\usepackage{eso-pic}
+\usepackage{setspace}
+%\usepackage{biblatex}
+%\addbibresource{sample.bib}
+\setstretch{1.2}
+
+\makeatletter
+	\titleformat{\section}{\Large\bfseries}{\thesection.}{1em}{}{}
+\makeatother
+
+\usepackage[unicode]{hyperref}
+%\theoremstyle{definition}
+\newtheorem{theorem}{Định lý}[section]
+\newtheorem{proposition}[theorem]{Mệnh đề}
+\newtheorem{corollary}[theorem]{Hệ quả}
+%\newtheorem{remark}[theorem]{Remark}
+\newtheorem{lemma}[theorem]{Bổ đề}
+%\newtheorem{note}[theorem]{Note}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Định nghĩa}
+\newtheorem{example}[theorem]{Ví dụ}
+
+\newcommand{\hinf}{\text{\emph{H$_\infty$ }}}
+\newcommand{\ita}{\emph{}}
+
+\usepackage{fancyhdr}
+	\fancyhf{}
+	\lhead{\fancyplain{}{\rightmark}}
+	\rhead{\thepage}
+\pagestyle{fancy}
+\thispagestyle{plain}
+	\title{\textbf{Tính toán chuẩn H$_\infty$ \\ thông qua công thức không gian trạng thái}}
+	\author{Đỗ Văn Chung - K62 Toán Tin ứng dụng}
+	\date{}
+
+%\usepackage{tocloft,calc}
+%\renewcommand{\cftchappresnum}{Chương }
+%\AtBeginDocument{\addtolength\cftchapnumwidth{\widthof{\bfseries Chương }}}
+
+\begin{document}
+\input{titlePage_Thesis.tex}
+\numberwithin{equation}{subsection}
+
+\thispagestyle{plain}
+\vspace*{2cm}
+\section*{\LARGE{Lời cảm ơn}}
+\vspace*{1cm}
+
+Luận văn này được hoàn thành dưới sự hướng dẫn của TS Hà Phi.
+
+\medskip
+Tôi xin chân thành cảm ơn TS Hà Phi đã hướng dẫn và cho những lời khuyên quý báu để tôi có thể hoàn thành bài luận văn này. Tôi cũng chân thành cảm ơn các thầy cô trong Khoa Toán - Cơ - Tin học đã cung cấp và truyền đạt cho tôi những kiến thức và kinh nghiệm quý giá trong quá trình học tập.
+
+\medskip
+Do thời gian và trình độ còn hạn chế nên luận văn của tôi không thể tránh khỏi những thiếu sót. Tôi rất kính mong nhận được sự góp ý của thầy cô và bạn bè để bài luận văn này được hoàn thiện hơn. 
+
+\medskip
+Tôi xin chân thành cảm ơn.
+
+\vspace*{1cm}
+Hà Nội, ngày 24 tháng 12 năm 2020,
+
+\medskip
+Sinh viên: Đỗ Văn Chung \\
+Lớp K62 Toán - Tin ứng dụng.
+
+\newpage
+\vspace*{2cm}
+\tableofcontents
+
+\newpage	
+
+\maketitle
+
+
+%Introduction
+\section{Giới thiệu}
+Một trong những đòi hỏi đặt ra trong lý thuyết điều khiển chính là việc thiết kế hệ thống điều khiển, giúp cho máy móc có một hiệu suất làm việc hợp lý dưới nhiều điều kiện đầu vào và các yếu tố gây nhiễu khác nhau. Lý thuyết điều khiển \hinf  được sử dụng để có thể giảm các lỗi mô hình hóa và các nhiễu không xác định trong một hệ thống, đồng thời cung cấp khả năng tối ưu hóa một cách định lượng được đối với một bài toán quy mô lớn có nhiều biến tham gia. Trong thực tế hầu hết các giải pháp của vấn đề sử dụng điều khiển \hinf  thực ra chỉ là các bộ điều khiển dưới mức tối ưu. Nghĩa là hàm chuyển của bộ điều khiển đạt đến một giới hạn định trước với chuẩn \hinf. Trong việc lập công thức cho bài toán, kết quả sẽ có chuẩn mạnh đối với một giới hạn cho trước. Tuy nhiên, nếu ta tìm thấy chuẩn \hinf , thì ta sẽ có câu trả lời cho sự tồn tại của bộ điều khiển trong một số nhiễu động nhất định đối với hệ thống.
+
+\medskip
+George Zames, \cite{23} đưa ra lý thuyết điều khiển \hinf bằng cách xây dựng việc giảm độ nhạy như một vấn đề trong tối ưu với toán tử chuẩn, cụ thể là chuẩn \hinf  \cite{15}. Tại đó \hinf là không gian của mọi các hàm có giá trị ma trận giải tích, bị giới hạn trong nửa mặt phẳng phức bên phải. Công thức này hoàn toàn dựa trên miền tần số. Zames gợi ý rằng việc sử dụng chuẩn \hinf làm thước đo hiệu suất sẽ đáp ứng tốt hơn nhu cầu ứng dụng so với thiết kế điều khiển Gaussian bậc hai tuyến tính phổ biến hơn \cite{25}. Từ đó, ta có thiết kế của điều khiển tối ưu \hinf  nhằm mục đích tìm ra một bộ điều khiển có thể ổn định được hệ thống trong khi giảm thiểu tác động của nhiễu gây ra. Chuẩn \hinf hiện được sử dụng để đánh giá một cách số lượng độ nhạy, độ mạnh và hiệu suất của bộ điều khiển của hệ thống phản hồi vòng kín.
+
+\medskip
+Ngay sau đó, John Doyle đã phát triển các công cụ để kiểm tra độ ổn định chắc trong nỗ lực đánh giá độ không đảm bảo của mô hình và đạt được mục tiêu điều khiển \hinf , giảm thiểu ảnh hưởng của những nhiễu động này lên các đầu ra được điều chỉnh \cite{18}. Vào năm 1984, Doyle sử dụng các phương pháp trong không gian trạng thái, và đưa ra giải pháp đầu tiên cho bài toán điều khiển tối ưu \hinf đa biến tổng quát \cite{6}.
+
+\bigskip
+Trong khi các công thức miền tần số này giải quyết các vấn đề về độ vững chắc, các công cụ được phát triển đều được cho là phức tạp và cung cấp cái nhìn hạn chế về bản chất của các giải pháp ổn định. Các công thức không gian trạng thái ban đầu được phát triển bởi Doyle, Francis và Glover vào giữa những năm 1980, nhưng chỉ thành công ở một mức độ nào đó,chúng là các giải pháp cho các công thức ban đầu này có các giải pháp bậc cao, xem \cite{8} và \cite{11}.
+
+\bigskip
+Vào cuối những năm 1980, công trình nghiên cứu của Khargonekar, Petersen, Rotea và Zhou, \cite{13}, \cite{14}, và \cite{20}, đã trình bày giải pháp cho vấn đề phản hồi trạng thái \hinf dưới dạng ma trận phản hồi liên tục và cung cấp công thức để tìm ma trận khuếch đại này như là đáp án cho một phương trình Riccati. Hơn nữa, họ đã thiết lập mối quan hệ giữa lý thuyết trò chơi tuyến tính-bậc hai và điều khiển tối ưu \hinf và đưa ra giải pháp cho vấn đề phản hồi trạng thái bằng cách giải một phương trình Riccati đại số.
+
+\medskip
+Năm 1989, Doyle, Glover, Khargonekar và Francis, \cite{7}, đã trình bày giải pháp không gian trạng thái tổng quát đầu tiên cho bài toán điều khiển \hinf trong bài báo kinh điển \emph{State-space solutions to standard \emph{H$_2$} and \hinf control problems.} Bài báo này đưa ra các kết quả cần và điều kiện đủ để tồn tại một bộ điều khiển có thể chấp nhận được các nghiệm của phương trình Riccati đại số và điều kiện ghép liên quan đến điều kiện của bán kính phổ. Do đó, công thức tạo ra các thuật toán sử dụng tiêu chí lõm cũng như các phương pháp giống như phương pháp Newton, xem \cite{9}, \cite{10}, và \cite{21}.
+
+\medskip
+Nghiên cứu này tập trung vào tập hợp các thuật toán được sử dụng cho mục đích điều khiển \hinf, đặc biệt là cho bài toán phản hồi trạng thái, \cite{3}, \cite{4} và các vấn đề phản hồi đầu ra. Sau đó, thuật toán được trình bày bởi Lin, Wang và Xu \cite{16}.
+
+%\medskip
+%Ý chính của phần còn lại như sau. Chương 2 cung cấp nền tảng cần thiết như khả năng kiểm soát, khả năng quan sát, khả năng phát hiện, tính ổn định cũng như các chủ đề khác như chức năng chuyển giao và giới thiệu chuẩn \hinf . Chương 3 thảo luận về hai thuật toán dựa trên công cụ miền tần số để tính chuẩn \hinf của một hàm chuyển với trường hợp phản hồi trạng thái. Thuật toán đầu tiên là thuật toán phân đôi được trình bày bởi \cite{3} và thuật toán thứ hai là thuật toán hai bước được trình bày ban đầu bởi \cite{4}.
+
+\medskip
+Phần thảo luận chính được tìm thấy trong Chương 4, nơi ta thảo luận và thực hiện thuật toán của Lin, Wang và Xu \cite{16} được đề xuất để tính chuẩn \hinf của trạng thái và các vấn đề điều khiển phản hồi đầu ra. Thuật toán sử dụng công thức không gian trạng thái như là  một công cụ miền tần số để tìm ra nguyên tố \emph{r} mà chuẩn \hinf của ma trận hàm chuyển nhỏ hơn \emph{r}. Bài toán tìm chuẩn \hinf được chia thành ba bài toán con. Hai giải pháp đầu tiên chủ yếu dựa vào các thuật toán được thảo luận trong Chương 3 và giải pháp thứ ba dựa vào bản chất hình học của bán kính quang phổ của tích của hai nghiệm cho Phương trình Riccati Đại số liên quan đến hai bài toán con đầu tiên. Phần kết luận được trình bày trong Chương 5.
+
+
+%Background
+\newpage
+\section{Kiến thức chuẩn bị}
+\subsection{Lập công thức không gian trạng thái}
+Ta xét hệ thời gian bất biến liên tục sau:
+\begin{align}
+    \dot{x}(t) &= Ax(t) + Bu(t), \; x(t_0) = x_0 \label{ct2.1.1} \\ 
+    y(t) &= Cx(t) + Du(t).\nonumber 
+\end{align}
+trong đó A là ma trận cỡ \emph{n $\times$ n}, B cỡ \emph{n $\times$ m}, C là \emph{r $\times$ n} và D cỡ \emph{r $\times$ m}. Vector \emph{x} biểu diễn trạng thái, \emph{u} là vector điều khiển và \emph{y} là đầu ra đã được tính toán. Ta minh họa bằng sơ đồ khối sau 
+%hinh 2.1
+
+\begin{example}
+Để có thể diễn tả rõ hơn việc lập công thức không gian trạng thái, ta xét hệ 2 vật nặng được nối với nhau bởi một lò xo và giảm chấn. Lực $\emph{u}$ tác động vào vật $M_1$, làm thay đổi vị trí $\emph{z}$ của vật $M_2$. Đầu vào của hệ này là lực tác động, đầu ra chính là sự thay đổi vị trí của vật $M_2$. Ở đây thứ ta cần quan tâm chính là việc ta có thể điều khiển được sự thay đổi vị trí của $M_2$.\\
+Áp dụng định luật II Newton, ta có:
+\begin{align}
+    M_1\ddot{w} &= -b(\dot{w} - \dot{z}) - k(w - z) + u \\
+    M_2\ddot{z} &= b(\dot{w} - \dot{z}) + k(w - z).
+\end{align}
+Ở đây, b là hệ số tắt dần, w và z liên tục là sự dịch chuyển  $M_1$ và $M_2$, k là hằng số của lò xo. Ta đưa hệ đạo hàm bậc 2 này về bậc 1 bằng cách:
+Đặt $x_1$ = w, $\dot{x_1}$ = $\dot{w}$ = $x_2$, $x_3$ = z, $\dot{x_3}$ = $x_4$ = $\dot{z}$. Khi đó,
+\begin{align}
+\dot{x_2} &= -\frac{b}{m_1}(x_2 - x_4) - \frac{k}{m_1}(x_1 - x_3) + u \label{ct2.1.4},  \\
+\dot{x_4} &= \frac{b}{m_2}(x_2 - x_4) + \frac{k}{m_1}(x_1 - x_3) + u, \\
+y &= x_3 \label{ct2.1.6}
+\end{align}
+Viết \eqref{ct2.1.4}-\eqref{ct2.1.6} lại hệ dưới dạng ma trận:
+\begin{align}
+    \begin{bmatrix}
+        \dot{x_1}\\ \dot{x_2}\\ \dot{x_3}\\ \dot{x_4}
+    \end{bmatrix}
+     &= 
+    \begin{bmatrix}
+     0 & 1 & 0 & 0\\
+     -\frac{k}{m_1} & -\frac{b}{m_1} & \frac{k}{m_1} & \frac{b}{m_1}\\
+     0 & 0 & 0 & 1\\
+     \frac{k}{m_2} & \frac{b}{m_2} & -\frac{k}{m_2} & -\frac{b}{m_2}
+     \end{bmatrix}
+     \cdot
+     \begin{bmatrix}
+     x_1 \\ x_2 \\ x_3 \\ x_4
+     \end{bmatrix}
+     + 
+     \begin{bmatrix}
+     0 \\ \frac{1}{m_1} \\ 0 \\ 0
+     \end{bmatrix}
+     \cdot u,\\
+     y &= 
+     \begin{bmatrix}
+     0 & 0 & 1 & 0 
+     \end{bmatrix}
+     \cdot
+     \begin{bmatrix}
+     x_1 \\ x_2 \\ x_3 \\ x_4.
+     \end{bmatrix}
+\end{align}
+Ta đưa hệ lò xo-giảm chấn này về dạng \eqref{ct2.1.1}, ta có:
+A = $\begin{bmatrix}
+     0 & 1 & 0 & 0\\
+     -\frac{k}{m_1} & -\frac{b}{m_1} & \frac{k}{m_1} & \frac{b}{m_1}\\
+     0 & 0 & 0 & 1\\
+     \frac{k}{m_2} & \frac{b}{m_2} & -\frac{k}{m_2} & -\frac{b}{m_2}
+     \end{bmatrix}
+\quad B = \begin{bmatrix}
+     0 \\ \frac{1}{m_1} \\ 0 \\ 0
+     \end{bmatrix}
+\quad C = \begin{bmatrix}
+     0 & 0 & 1 & 0 
+     \end{bmatrix}
+\quad D = 0.$
+\end{example}
+
+%state-space solution
+\subsection{Nghiệm không gian-trạng thái}
+Nếu ta đã biết vector \emph{u}, hệ \eqref{ct2.1.1} có thể giải được nhanh chóng. Trước khi đi vào cụ thể, ta cần biết một vài định nghĩa \cite{5}
+\begin{definition}
+Cho ma trận A cỡ n $\times$ n, khi đó ta định nghĩa \textbf{hàm mũ ma trận} là \[ e^{At} = \sum_{k = 0}^{\infty} \frac{(At)^k}{k!} \]
+\end{definition}
+Hai điều lưu ý về hàm mũ ma trận:\\
+1, \emph{$e^{A0} = A^0 = I$} \\
+2, \emph{$\frac{d}{dt}e^{At} = \sum_{k = 0}^{\infty} \frac{d}{dt} \frac{A^k t^k}{k!} = \sum_{k = 1}^{\infty} \frac{A^k t^{k-1}}{(k-1)!} = \sum_{k = 0}^{\infty}A\frac{A^k t^k}{k!} = Ae^{At}$}.\\
+Dễ dàng tìm được nghiệm đối với phương trình ban đầ 
+\begin{align}
+    \dot{x}(t) = Ax(t),\; x(t_0) = x_0, 
+\end{align}
+là x(t) = $e^{A(t-t_0)}x_0$
+Trở lại với phương trình tổng quát
+\begin{align}
+    \dot{x}(t) &= Ax(t) + Bu(t), \; x(t_0) = x_0 \label{ct2.2.2} \\ 
+    y(t) &= Cx(t) + Du(t). \label{ct2.2.3}
+\end{align}
+ta sẽ tìm nghiệm qua biến đổi Laplace.
+\begin{definition}[Biến đổi Laplace]
+Hàm f(x), x $\in$ [0,$\infty$) có biến đổi Laplace là tích phân L(f(x))(s) = $\hat{f}$(s) = $\displaystyle \int_1^\infty f(x)e^{-sx}dx$ với giá trị s $\in$ $\mathbb{C}$ mà tích phân định nghĩa.
+\end{definition}
+Hàm Laplace ngược của $\hat{f}$ là $L^{-1} \hat{f}$ = f. Ta biến đổi Laplace \eqref{ct2.2.2} tìm nghiệm $\hat{x}$ là
+\begin{align}
+    \hat{x}(s) = (sI - A)^{-1} x_0 + (sI - A)^{-1} B \hat{u}(s) \label{ct2.2.4}
+\end{align}
+Áp dụng hàm Laplace ngược \eqref{ct2.2.4} cho ta nghiệm
+\begin{align}
+    x(t) &= L^{-1}((sI - A)^{-1} x_0) + L^{-1}((sI - A)^{-1} B \hat{u}(t)) \nonumber\\
+         &= e^{A(t-t_0)}{x_0} + \displaystyle \int_{t_0}^t e^{A(t-s)}Bu(s)ds. \label{ct2.2.5}
+\end{align}
+Lấy \eqref{ct2.2.5} trừ đi \eqref{ct2.2.3} ta tìm được $y(t) = Ce^{A(t-t_0)}x_0 + \int_{t_0}^t Ce^{A(t-s)}Bu(s)ds + Du(t)$
+\begin{definition}
+Ma trận $e^{A(t-t_0)}$ được gọi là ma trận chuyển trạng thái.
+\end{definition}
+Nếu ta chưa biết trước được vector \emph{u} thì ta có thể sử dụng nhiều phương pháp khác nhau để cho ra kết quả như ý muốn.
+\subsection{Hàm chuyển}
+Hàm chuyển sẽ cho ta thấy mối quan hệ mật thiết giữa đầu vào và đầu ra của hệ thống và sự ảnh hưởng của nhiễu đối với đầu ra như thế nào.
+Để tìm ra hàm chuyển của hệ \eqref{ct2.1.1}
+\begin{align}
+    \dot{x}(t) &= Ax(t) + Bu(t), \; x(0) = x_0 \label{ct2.3.1} \\ 
+    y(t) &= Cx(t) + Du(t) \nonumber
+\end{align}
+ta sử dụng biến đổi Laplace như \eqref{ct2.2.4} thu được nghiệm
+\begin{align}
+    \hat{x}(s) &= (sI - A)^{-1} x_0 + (sI - A)^{-1} B \hat{u}(s) \label{ct2.3.2}\\
+    \hat{y}(s) &= C\hat{x}(s) + D\hat{u}(s). \label{ct2.3.3}
+\end{align}
+Lấy \eqref{ct2.3.2} trừ cho \eqref{ct2.3.3} và đặt G(s) = $\frac{\hat{y}(s)}{\hat{u}(s)}$. Phương trình \eqref{ct2.3.3} trở thành 
+\begin{align}
+    \hat{y}(s) = G(s)\hat{u}(s) \nonumber
+\end{align}
+hay 
+\begin{align}
+    G(s) = \frac{\hat{y}(s)}{\hat{u}(s)}
+\end{align}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\section{Kết luận}
+Điều hấp dẫn nhất trong bài báo của Lin, Wang và Xu là việc họ sử dụng các công thức miền tần số trong công thức không gian trạng thái. Công thức không gian trạng thái ban đầu được phát triển trong nỗ lực chuyển từ cách tiếp cận miền tần số sang điều khiển \hinf. Tuy nhiên, Lin Wang và Xu đã biến đổi lại một số điều kiện cần và đủ của không gian trạng thái như là một tuyên bố về các giá trị suy biến.
+
+\medskip
+Một vấn đề chính nảy sinh từ việc biến đổi này là việc tính toán chính xác các giá trị riêng. Cần lưu ý rằng đối với mục đích của nghiên cứu này, các hàm MatLab được sử dụng để tính toán tất cả các giá trị riêng và giá trị suy biến. Tuy nhiên, điều này đã không xảy ra ở \cite{16} nơi mà các bộ giải riêng chính xác được sử dụng.
+
+\medskip
+Việc tính toán chính xác các giá trị riêng là điều tối quan trọng ở đây. Lý do cho điều này là quá trình ra quyết định vốn có trong thuật toán được trình bày trong Chương 4. Tính chất đối xứng của ma trận Hamilton là yếu tố then chốt trong việc sử dụng công thức không gian trạng thái. Nhiều bộ giải riêng không có khả năng bảo toàn tính chất này và kết quả là độ chính xác trong tính toán của chúng bị mất đi. Đổi lại, vì thuật toán ở đây dựa vào việc trả lời loại có hoặc không, xóa toàn bộ khoảng thời gian khỏi một tìm kiếm, dương hoặc âm sai có thể gây ra kết quả sai. Ví dụ, giả sử thuật toán hội tụ đến một giá trị sao cho nó chỉ ra một bộ điều khiển tồn tại một nhiễu lỗi lớn hơn so với thực tế nó có thể đáp ứng được. Người ta có thể lãng phí tài nguyên khi triển khai một điều khiển chỉ để thấy rằng nó không hoạt động khi được áp dụng.
+
+\medskip
+Các kế hoạch nghiên cứu trong tương lai bao gồm triển khai các bộ giải riêng chính xác hơn và áp dụng thuật toán này cho một mô hình quy mô lớn từ kiểu thiết lập ứng dụng. Sẽ tốt nếu ta xem liệu thuật toán này có thể cạnh tranh được với các phương pháp khác hiện đang được sử dụng để ước tính chuẩn \hinf của một hệ thống.
+
+%\clearpage
+%\addcontentsline{toc}{section}{Tài liệu tham khảo}
+%\printbibliography
+\newpage
+\begin{thebibliography}{99}
+%1
+\bibitem{1} T. Başar and P. Bernhard. \textit{H-infinity optimal control and related minimax design problems: a dynamic game approach.} Birkhäuser Boston, 2008.
+%2
+\bibitem{2} P. Benner, V. Mehrmann. and H. Xu. A numerically stable, structure preserving method for computing the eigenvalues of real hamiltonian or symplectic pencils. \textit{Numerische Mathematik,} 78(3):329–358, 1998.
+%3
+\bibitem{3} S. Boyd, V. Balakrishnan, and P. Kabamba. A bisection method for computing the \hinf norm of a transfer matrix and related problems. \textit{Mathematics of Control, Signals, and Systems (MCSS),} 2(3):207–219, 1989.
+%4
+\bibitem{4} NA Bruinsma and M. Steinbuch. A fast algorithm to compute the \hinf norm of a transfer function matrix. \textit{Systems \& Control Letters,} 14(4):287–293, 1990.
+%5
+\bibitem{5} B. Datta. \textit{Numerical methods for linear control systems.} Academic Press, 2003.
+%6
+\bibitem{6} J.C. Doyle et al, Advances in multivariable control. In \textit{Lecture Notes at ONR/Honeywell Workshop. Minneapolis, MN,} 1984.
+%7
+\bibitem{7} J.C. Doyle, K. Glover, P.P. Khargonekar, and B.A. Francis. State-space solutions to standard \emph{H$_2$} and \hinf control problems. \textit{Automatic Control, IEEE Transactions on} 34(8):831–847, 1989.
+%8
+\bibitem{8} B.A. Francis and J.C. Doyle. Linear control theory with an \hinf optimality criterion. \textit{SIAM Journal on Control and Optimization, } 25(4):815–844, 1987.
+%9
+\bibitem{9} P. Gahinet. On the game riccati equations arising in H1 control problem. \textit{SIAM Journal on Control and Optimization,} 32(3):635–647, 1994.
+%10
+\bibitem{10} P.M. Gahinet and P. Pandey. Fast and numerically robust algorithm for computing the \hinf optimum. In \textit{Decision and Control, 1991., Proceedings of the 30th IEEE Conference on } pages 200–205. IEEE, 1991.
+%11
+\bibitem{11} K. Glover. All optimal Hankel-norm approximations of linear multivariable systems and their \emph{$L_\infty$} error bounds. \textit{International Journal of Control,} 39(6):1115–1193, 1984.
+%12
+\bibitem{12} G. Hewer. Existence theorems for positive semidefinite and sign indefinite stabilizing solutions of \hinf riccati equations. \textit{SIAM journal on control and optimization,} 31(1):16–29, 1993.
+%13
+\bibitem{13} P.P. Khargonekar, I.R. Petersen, and M.A. Rotea. \hinf-optimal control with statefeedback. \textit{Automatic Control, IEEE Transactions on, } 33(8):786–788, 1988.
+%14
+\bibitem{14} P.P. Khargonekar, I.R. Petersen, and K. Zhou. Robust stabilization of uncertain linear systems: quadratic stabilizability and \hinf control theory. \textit{Automatic Control, IEEE Transactions on } 35(3):356–361, 1990.
+%15 
+\bibitem{15} D.J.N. Limebeer and M. Green. \textit{Linear robust control.}. Prentice-Hall, Englewood Clis, NJ, 1995.
+%16
+\bibitem{16} W.W. Lin, C.S. Wang, and Q.F. Xu. On the computation of the optimal \hinf norms for two feedback control problems. \textit{Linear algebra and its applications,} 287(1):223–255, 1999.
+%17
+\bibitem{17} K.A. Morris. \textit{Introduction to feedback control.} Academic Press, Inc., 2000.
+%18
+\bibitem{18} A. Packard, M.K.H. Fan, and J. Doyle. A power method for the structured singular value. In \textit{Decision and Control, 1988., Proceedings of the 27th IEEE Conference on} pages 2132–2137. IEEE, 1988.
+%19
+\bibitem{19} P. Pandey, C. Kenney, A. Packard, and AJ Laub. A gradient method for computing the optimal \hinf-norm. \textit{Automatic Control, IEEE Transactions on,} 36(7):887–890, 1991.
+%20
+\bibitem{20} I. Petersen. Disturbance attenuation and \hinf optimization: a design method based on the algebraic riccati equation. \textit{Automatic Control, IEEE Transactions on} 32(5):427–429, 1987.
+%21
+\bibitem{21} C. Scherer. \hinf-control by state-feedback and fast algorithms for the computation of optimal \hinf-norms. \textit{Automatic Control, IEEE Transactions on} 35(10):1090–1099, 1990.
+%22
+\bibitem{22} D. Tall and S. Vinner. Concept image and concept definition in mathematics with particular reference to limits and continuity. \textit{Educational studies in mathematics, } 12(2):151–169, 1981.
+%23
+\bibitem{23} G.Zames. Feedback and optimal sensitivity: Model reference transformations, multiplicative seminorms, and approximate inverses. \textit{Automatic Control, IEEE Transactions on}, 26(2):301–320, 1981.
+%24
+\bibitem{24} M. Zandieh. A theoretical framework for analyzing student understanding of the concept of derivative. \textit{Research in Collegiate Mathematics Education. IV. CBMS Issues in Mathematics Education,} pages 103–127, 2000.
+%25
+\bibitem{25} K. Zhou, J.C. Doyle, K. Glover, et al. \textit{Robust and optimal control,} volume 40. Prentice Hall Upper Saddle River, NJ, 1996.
+\end{thebibliography}
+\end{document} 
